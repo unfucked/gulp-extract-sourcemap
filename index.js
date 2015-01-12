@@ -45,6 +45,8 @@ function extract(opts){
                 if (sMap && opts.removeSourcesContent && sMap.sourcesContent) {
                     delete sMap.sourcesContent;
                 }
+                // unfuck: allow absolute source map urls if basedir not specified //
+                if (opts.basedir !== undefined) {
                 if (sMap && sMap.sources) {
                     var basedir = opts.basedir || file.cwd || process.cwd();
 
@@ -54,11 +56,14 @@ function extract(opts){
                 }
             }
 
+            }
+
             if (sMap) {
                 this.push(new File({
                     cwd: file.cwd,
                     base: file.base,
-                    path: path.join(file.base, sMapFileName),
+                    // unfuck: ensure source map is in the same location as the file - not the root! //
+                    path: path.join(path.dirname(file.path), sMapFileName),
                     contents: new Buffer( JSON.stringify( sMap ) )
                 }));
 
